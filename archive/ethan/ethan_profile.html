@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Ethan Bennett — Hinge</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #f5f2ed;
+    --card: #ffffff;
+    --text-dark: #1a1612;
+    --text-mid: #4a453e;
+    --text-light: #9a948c;
+    --accent: #6c3fa3;
+    --accent-light: #e8dff5;
+    --border: #e8e3dc;
+  }
+
+  body {
+    background: var(--bg);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 0 0 60px;
+  }
+
+  .phone-shell {
+    width: 100%;
+    max-width: 420px;
+    background: var(--bg);
+    min-height: 100vh;
+    position: relative;
+  }
+
+  /* NAME HEADER */
+  .name-header {
+    padding: 28px 20px 4px;
+    background: var(--bg);
+  }
+
+  .name-header h1 {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 38px;
+    font-weight: 600;
+    color: var(--text-dark);
+    letter-spacing: -0.015em;
+    line-height: 1;
+  }
+
+  .name-header .name-sub {
+    font-size: 15px;
+    color: var(--text-dark);
+    font-weight: 400;
+    margin-top: 6px;
+    letter-spacing: 0.01em;
+  }
+
+  /* SCROLL AREA */
+  .profile-scroll {
+    padding: 12px 14px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* CARDS */
+  .card {
+    background: var(--card);
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+
+  /* VIDEO CARD */
+  .video-card {
+    position: relative;
+    border-radius: 18px;
+    overflow: hidden;
+    background: #111;
+    aspect-ratio: 1/1;
+  }
+
+  .video-card video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .video-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 60px 18px 18px;
+    background: linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 100%);
+  }
+
+  .video-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.75);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+
+  .play-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.18);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .play-btn:hover { background: rgba(255,255,255,0.28); }
+  .play-btn svg { width: 14px; height: 14px; fill: #fff; }
+
+  /* PROMPT CARD */
+  .prompt-card {
+    padding: 20px 22px 22px;
+  }
+
+  .prompt-label {
+    font-size: 13px;
+    color: var(--text-dark);
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    margin-bottom: 8px;
+  }
+
+  .prompt-answer {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 17px;
+    font-weight: 400;
+    color: var(--text-dark);
+    line-height: 1.55;
+    letter-spacing: 0.01em;
+  }
+
+  .prompt-answer.small {
+    font-size: 17px;
+    font-weight: 400;
+    line-height: 1.55;
+    color: var(--text-mid);
+    letter-spacing: 0.01em;
+  }
+
+  /* INFO STRIP */
+  .info-strip {
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: var(--card);
+    border-radius: 18px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  }
+
+  .info-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--text-mid);
+    font-size: 15px;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+  }
+
+  .info-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    opacity: 0.6;
+  }
+
+  /* TAGS */
+  .tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 16px 20px;
+  }
+
+  .tag {
+    background: var(--accent-light);
+    color: var(--accent);
+    border-radius: 50px;
+    padding: 7px 15px;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+  }
+
+  /* ACTION BAR */
+  .action-bar {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 420px;
+    background: var(--bg);
+    border-top: 1px solid var(--border);
+    padding: 12px 32px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    z-index: 200;
+  }
+
+  .action-skip {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: #fff;
+    border: 1.5px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: transform 0.15s;
+    flex-shrink: 0;
+  }
+  .action-skip:hover { transform: scale(1.05); }
+  .action-skip svg { width: 22px; height: 22px; fill: var(--text-light); }
+
+  .action-like {
+    flex: 1;
+    height: 52px;
+    border-radius: 50px;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 14px rgba(108,63,163,0.35);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .action-like:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(108,63,163,0.4); }
+  .action-like svg { width: 18px; height: 18px; fill: #fff; }
+
+  .action-star {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: #fff3e0;
+    border: 1.5px solid #f5c97a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: transform 0.15s;
+    flex-shrink: 0;
+  }
+  .action-star:hover { transform: scale(1.05); }
+  .action-star svg { width: 22px; height: 22px; fill: #f5a623; }
+
+</style>
+</head>
+<body>
+<div class="phone-shell">
+
+  <!-- NAME HEADER -->
+  <div class="name-header">
+    <h1>Ethan Bennett</h1>
+    <div class="name-sub">29 · Denver, CO</div>
+  </div>
+
+  <div class="profile-scroll">
+
+    <!-- VIDEO CARD -->
+    <div class="video-card card" id="videoCard" onclick="toggleVideo()" style="cursor:pointer;">
+      <video id="profileVideo" playsinline preload="metadata" poster="ethan_poster.jpg">
+        <source src="ethan_profile.mp4" type="video/mp4">
+      </video>
+      <div class="video-overlay">
+        <div class="video-label">My vibe</div>
+        <button class="play-btn" id="playBtn">
+          <svg id="playIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          <span id="playText">Play video</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- INFO STRIP -->
+    <div class="info-strip">
+      <div class="info-row">
+        <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+        </svg>
+        <span>29 · Man</span>
+      </div>
+      <div class="info-row">
+        <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 3v4M8 3v4M2 11h20"/>
+        </svg>
+        <span>Mechanical Engineer · Aerospace</span>
+      </div>
+      <div class="info-row">
+        <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/>
+        </svg>
+        <span>Denver, CO</span>
+      </div>
+      <div class="info-row">
+        <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        </svg>
+        <span>Looking for a long-term relationship</span>
+      </div>
+      <div class="info-row">
+        <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M12 22s-8-5-8-11a8 8 0 0 1 16 0c0 6-8 11-8 11z"/>
+        </svg>
+        <span>5'11''</span>
+      </div>
+    </div>
+
+    <!-- INTERESTS TAGS -->
+    <div class="card">
+      <div style="padding: 16px 20px 8px;">
+        <div class="prompt-label">Interests</div>
+      </div>
+      <div class="tag-row" style="padding-top: 0;">
+        <span class="tag">🥾 Hiking</span>
+        <span class="tag">⚽ Soccer</span>
+        <span class="tag">🍺 Breweries</span>
+        <span class="tag">🍳 Cooking</span>
+        <span class="tag">🚗 Road trips</span>
+        <span class="tag">☕ Coffee shops</span>
+        <span class="tag">🏔️ Mountains</span>
+        <span class="tag">🌿 Outdoors</span>
+      </div>
+      <div style="padding-bottom: 12px;"></div>
+    </div>
+
+    <!-- PROMPT 1 -->
+    <div class="card prompt-card">
+      <div class="prompt-label">My friends describe me as</div>
+      <div class="prompt-answer">Thoughtful, calm, and the one who actually shows up when it counts.</div>
+    </div>
+
+    <!-- PROMPT 2 -->
+    <div class="card prompt-card">
+      <div class="prompt-label">A good weekend looks like</div>
+      <div class="prompt-answer">An early hike, something good to eat, a coffee shop to decompress, and easy time with people I actually like being around.</div>
+    </div>
+
+    <!-- PROMPT 3 -->
+    <div class="card prompt-card">
+      <div class="prompt-label">On a typical week you'll find me</div>
+      <div class="prompt-answer">Hiking a new trail, playing pickup soccer, trying a local brewery, or taking a spontaneous drive into the mountains.</div>
+    </div>
+
+    <!-- GREEN FLAGS -->
+    <div class="card prompt-card">
+      <div class="prompt-label">Green flags I look for</div>
+      <div class="prompt-answer small">Someone grounded, emotionally stable, and who genuinely enjoys being outside. I'm drawn to people who find meaning in shared experiences over loud social scenes.</div>
+    </div>
+
+    <!-- DATING ME -->
+    <div class="card prompt-card">
+      <div class="prompt-label">Dating me will look like</div>
+      <div class="prompt-answer small">Morning hikes, cooking dinner together, low-key brewery evenings, and road trips with no strict itinerary. Steady, real, and easy to be around.</div>
+    </div>
+
+    <div style="height: 70px;"></div>
+  </div>
+
+  <!-- ACTION BAR -->
+  <div class="action-bar">
+    <div class="action-skip">
+      <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+    </div>
+    <button class="action-like">
+      <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      Like Ethan Bennett
+    </button>
+    <div class="action-star">
+      <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  let playing = false;
+  const video = document.getElementById('profileVideo');
+  const playIcon = document.getElementById('playIcon');
+  const playText = document.getElementById('playText');
+
+  function toggleVideo() {
+    if (!playing) {
+      video.play();
+      playing = true;
+      playIcon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+      playText.textContent = 'Pause';
+    } else {
+      video.pause();
+      playing = false;
+      playIcon.innerHTML = '<path d="M8 5v14l11-7z"/>';
+      playText.textContent = 'Play video';
+    }
+  }
+  video.addEventListener('ended', function() {
+    playing = false;
+    playIcon.innerHTML = '<path d="M8 5v14l11-7z"/>';
+    playText.textContent = 'Play video';
+    video.load();
+  });
+</script>
+</body>
+</html>

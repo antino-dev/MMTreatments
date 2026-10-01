@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Device Check</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      background: #f5f5f7;
+      color: #1d1d1f;
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 3rem 1rem;
+    }
+
+    .page { width: 100%; max-width: 640px; }
+
+    .header { text-align: center; margin-bottom: 2.5rem; }
+    .header h1 { font-size: 28px; font-weight: 600; letter-spacing: -0.5px; color: #1d1d1f; margin-bottom: 8px; }
+    .header p { font-size: 16px; color: #6e6e73; line-height: 1.6; }
+
+    .steps { display: flex; flex-direction: column; gap: 12px; }
+
+    .card {
+      background: #ffffff;
+      border: 1px solid #e0e0e5;
+      border-radius: 16px;
+      padding: 20px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .card.active {
+      border-color: #b0b0bb;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+
+    .card-header { display: flex; align-items: center; gap: 12px; }
+
+    .step-num {
+      width: 30px; height: 30px; border-radius: 50%;
+      border: 1px solid #d0d0d5;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 600; color: #6e6e73;
+      flex-shrink: 0; transition: all 0.3s;
+    }
+    .step-num.done { background: #34c759; border-color: #34c759; color: white; }
+    .step-num.active { background: #1d1d1f; border-color: #1d1d1f; color: white; }
+
+    .card-title { font-size: 16px; font-weight: 600; color: #1d1d1f; flex: 1; }
+    .card-status { font-size: 13px; color: #6e6e73; }
+    .card-status.ok { color: #34c759; }
+    .card-status.err { color: #ff3b30; }
+
+    .card-body {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid #f0f0f5;
+    }
+
+    /* Camera */
+    .video-wrap {
+      position: relative; width: 100%;
+      border-radius: 10px; overflow: hidden;
+      background: #111; aspect-ratio: 16/9;
+    }
+    video { width: 100%; height: 100%; object-fit: cover; display: block; transform: scaleX(-1); }
+    .video-off {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 8px; color: #666; font-size: 14px;
+    }
+
+    /* Mic meter */
+    .mic-row { display: flex; align-items: center; gap: 12px; }
+    .meter-wrap { flex: 1; height: 8px; background: #f0f0f5; border-radius: 99px; overflow: hidden; }
+    .meter-fill { height: 100%; width: 0%; background: #34c759; border-radius: 99px; transition: width 0.05s; }
+    .meter-fill.loud { background: #ff9500; }
+    .mic-label { font-size: 13px; color: #6e6e73; min-width: 100px; text-align: right; }
+
+    /* Tone visualizer */
+    .tone-vis { display: flex; align-items: center; gap: 4px; height: 36px; margin-bottom: 14px; }
+    .tone-bar { width: 5px; border-radius: 99px; background: #d0d0d5; transition: height 0.08s, background 0.2s; }
+    .tone-bar.playing { background: #34c759; }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 9px 18px; border-radius: 10px;
+      border: 1px solid #d0d0d5; background: #ffffff;
+      font-size: 14px; font-family: inherit;
+      color: #1d1d1f; cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+      font-weight: 500;
+    }
+    .btn:hover { background: #f5f5f7; border-color: #b0b0bb; }
+    .btn:active { transform: scale(0.98); }
+    .btn-primary { background: #1d1d1f; color: #ffffff; border-color: transparent; }
+    .btn-primary:hover { background: #3a3a3c; border-color: transparent; }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+    .btn-danger { border-color: #ff3b30; color: #ff3b30; }
+    .btn-danger:hover { background: #fff5f5; }
+
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 14px; }
+    .hint { font-size: 13px; color: #6e6e73; margin-top: 10px; line-height: 1.5; }
+    .hint.ok { color: #34c759; }
+    .hint.err { color: #ff3b30; }
+
+    /* All set */
+    #allset-page {
+      display: none; flex-direction: column; align-items: center;
+      justify-content: center; text-align: center;
+      padding: 4rem 1rem; min-height: 480px;
+    }
+    #allset-page.show { display: flex; }
+    .check-circle {
+      width: 72px; height: 72px; border-radius: 50%;
+      background: #e8faf0;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 1.5rem;
+    }
+    #allset-page h2 { font-size: 26px; font-weight: 600; color: #1d1d1f; margin-bottom: 10px; }
+    #allset-page p { font-size: 16px; color: #6e6e73; line-height: 1.6; max-width: 380px; }
+    .pills { display: flex; gap: 8px; margin-top: 1.5rem; flex-wrap: wrap; justify-content: center; }
+    .pill {
+      font-size: 13px; padding: 5px 14px; border-radius: 99px;
+      background: #e8faf0; color: #1a7a40; font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- Main flow -->
+  <div id="main-page">
+    <div class="header">
+      <h1>Device check</h1>
+      <p>Let's make sure your camera, microphone, and speakers<br>are working before the session begins.</p>
+    </div>
+
+    <div class="steps">
+
+      <!-- Step 1: Camera -->
+      <div class="card active" id="card-camera">
+        <div class="card-header">
+          <div class="step-num active" id="num-camera">1</div>
+          <span class="card-title">Camera</span>
+          <span class="card-status" id="status-camera">Not checked</span>
+        </div>
+        <div class="card-body" id="body-camera">
+          <div class="video-wrap">
+            <div class="video-off" id="video-off">
+              <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" style="opacity:0.35;">
+                <path d="M15 10l4.553-2.069A1 1 0 0121 8.845v6.31a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/>
+              </svg>
+              <span>Camera preview will appear here</span>
+            </div>
+            <video id="video" autoplay playsinline muted style="display:none;"></video>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" id="btn-camera" onclick="startCamera()">Start camera</button>
+            <span class="hint" id="camera-hint">Your browser will ask for permission.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Microphone -->
+      <div class="card" id="card-mic">
+        <div class="card-header">
+          <div class="step-num" id="num-mic">2</div>
+          <span class="card-title">Microphone</span>
+          <span class="card-status" id="status-mic">Not checked</span>
+        </div>
+        <div class="card-body" id="body-mic" style="display:none;">
+          <div class="mic-row">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6e6e73" stroke-width="1.5" style="flex-shrink:0;">
+              <path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/>
+              <path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/>
+            </svg>
+            <div class="meter-wrap"><div class="meter-fill" id="meter-fill"></div></div>
+            <span class="mic-label" id="mic-label">Waiting...</span>
+          </div>
+          <p class="hint" style="margin-top:10px;">Speak or make some noise — you should see the bar move.</p>
+          <div class="btn-row">
+            <button class="btn btn-primary" id="btn-mic" onclick="startMic()">Start mic test</button>
+            <button class="btn" id="btn-mic-ok" onclick="confirmMic()" style="display:none;">Looks good</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 3: Speaker -->
+      <div class="card" id="card-speaker">
+        <div class="card-header">
+          <div class="step-num" id="num-speaker">3</div>
+          <span class="card-title">Speaker</span>
+          <span class="card-status" id="status-speaker">Not checked</span>
+        </div>
+        <div class="card-body" id="body-speaker" style="display:none;">
+          <p class="hint" style="margin-top:0; margin-bottom:14px;">Press the button to play a short test tone. Make sure you can hear it clearly.</p>
+          <div class="tone-vis" id="tone-vis">
+            <div class="tone-bar" style="height:6px;" id="tb0"></div>
+            <div class="tone-bar" style="height:14px;" id="tb1"></div>
+            <div class="tone-bar" style="height:22px;" id="tb2"></div>
+            <div class="tone-bar" style="height:28px;" id="tb3"></div>
+            <div class="tone-bar" style="height:32px;" id="tb4"></div>
+            <div class="tone-bar" style="height:28px;" id="tb5"></div>
+            <div class="tone-bar" style="height:22px;" id="tb6"></div>
+            <div class="tone-bar" style="height:14px;" id="tb7"></div>
+            <div class="tone-bar" style="height:6px;" id="tb8"></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" id="btn-speaker" onclick="testSpeaker()">Play test tone</button>
+            <button class="btn" id="btn-speaker-ok" onclick="confirmSpeaker()" style="display:none;">I heard it clearly</button>
+            <button class="btn btn-danger" id="btn-speaker-no" onclick="speakerFail()" style="display:none;">Didn't hear anything</button>
+          </div>
+          <p class="hint" id="speaker-hint" style="margin-top:10px;">Make sure your volume is turned up.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- All set screen -->
+  <div id="allset-page">
+    <div class="check-circle">
+      <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#34c759" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 6L9 17l-5-5"/>
+      </svg>
+    </div>
+    <h2>You're all set!</h2>
+    <p>Your camera, microphone, and speakers are working correctly. You're ready to begin the session.</p>
+    <div class="pills">
+      <span class="pill">Camera ready</span>
+      <span class="pill">Microphone ready</span>
+      <span class="pill" id="speaker-pill">Speaker ready</span>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  let cameraOk = false, micOk = false, speakerOk = false;
+  let audioCtx = null, analyser = null, micStream = null, animFrame = null, toneAnim = null;
+
+  function setStatus(id, text, cls) {
+    const el = document.getElementById('status-' + id);
+    el.textContent = text;
+    el.className = 'card-status' + (cls ? ' ' + cls : '');
+  }
+
+  function setNum(id, done, active) {
+    const el = document.getElementById('num-' + id);
+    el.className = 'step-num' + (done ? ' done' : active ? ' active' : '');
+    el.innerHTML = done
+      ? '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>'
+      : (id === 'camera' ? '1' : id === 'mic' ? '2' : '3');
+  }
+
+  function expandCard(id) {
+    document.getElementById('body-' + id).style.display = 'block';
+    document.getElementById('card-' + id).classList.add('active');
+  }
+
+  /* ── Camera ── */
+  async function startCamera() {
+    const btn = document.getElementById('btn-camera');
+    const hint = document.getElementById('camera-hint');
+    btn.disabled = true;
+    btn.textContent = 'Requesting permission…';
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      const video = document.getElementById('video');
+      video.srcObject = stream;
+      video.style.display = 'block';
+      document.getElementById('video-off').style.display = 'none';
+      hint.className = 'hint ok';
+      hint.textContent = 'Can you see yourself? If yes, your camera is working.';
+      setTimeout(() => {
+        btn.textContent = 'Looks good';
+        btn.disabled = false;
+        btn.onclick = confirmCamera;
+      }, 1200);
+    } catch (e) {
+      btn.textContent = 'Try again';
+      btn.disabled = false;
+      hint.className = 'hint err';
+      hint.textContent = 'Permission denied. Please allow camera access in your browser settings.';
+    }
+  }
+
+  function confirmCamera() {
+    cameraOk = true;
+    setStatus('camera', 'Ready', 'ok');
+    setNum('camera', true, false);
+    document.getElementById('card-camera').classList.remove('active');
+    setNum('mic', false, true);
+    expandCard('mic');
+  }
+
+  /* ── Microphone ── */
+  async function startMic() {
+    const btn = document.getElementById('btn-mic');
+    btn.disabled = true;
+    btn.textContent = 'Requesting…';
+    try {
+      micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      audioCtx = new AudioContext();
+      analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 512;
+      const src = audioCtx.createMediaStreamSource(micStream);
+      src.connect(analyser);
+      animFrame = requestAnimationFrame(drawMeter);
+      btn.style.display = 'none';
+      document.getElementById('btn-mic-ok').style.display = 'inline-flex';
+      document.getElementById('mic-label').textContent = 'Listening…';
+    } catch (e) {
+      btn.disabled = false;
+      btn.textContent = 'Try again';
+      document.getElementById('mic-label').textContent = 'Denied';
+    }
+  }
+
+  function drawMeter() {
+    const data = new Uint8Array(analyser.frequencyBinCount);
+    analyser.getByteFrequencyData(data);
+    const avg = data.reduce((a, b) => a + b, 0) / data.length;
+    const pct = Math.min(100, avg * 2.5);
+    const fill = document.getElementById('meter-fill');
+    fill.style.width = pct + '%';
+    fill.className = 'meter-fill' + (pct > 60 ? ' loud' : '');
+    const label = document.getElementById('mic-label');
+    if (pct < 5) label.textContent = 'Quiet…';
+    else if (pct < 30) label.textContent = 'Detecting input';
+    else if (pct < 60) label.textContent = 'Good signal';
+    else label.textContent = 'Strong signal';
+    animFrame = requestAnimationFrame(drawMeter);
+  }
+
+  function confirmMic() {
+    micOk = true;
+    cancelAnimationFrame(animFrame);
+    if (micStream) micStream.getTracks().forEach(t => t.stop());
+    if (audioCtx) audioCtx.close();
+    document.getElementById('meter-fill').style.width = '0%';
+    setStatus('mic', 'Ready', 'ok');
+    setNum('mic', true, false);
+    document.getElementById('card-mic').classList.remove('active');
+    setNum('speaker', false, true);
+    expandCard('speaker');
+  }
+
+  /* ── Speaker ── */
+  function testSpeaker() {
+    const btn = document.getElementById('btn-speaker');
+    btn.disabled = true;
+    btn.textContent = 'Playing…';
+    animateToneBars(true);
+
+    const ctx = new AudioContext();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(440, ctx.currentTime);
+    osc.frequency.linearRampToValueAtTime(660, ctx.currentTime + 0.4);
+    osc.frequency.linearRampToValueAtTime(440, ctx.currentTime + 0.8);
+    gain.gain.setValueAtTime(0, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.4, ctx.currentTime + 0.05);
+    gain.gain.setValueAtTime(0.4, ctx.currentTime + 0.75);
+    gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 1.0);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 1.0);
+    osc.onended = () => {
+      ctx.close();
+      animateToneBars(false);
+      btn.textContent = 'Play again';
+      btn.disabled = false;
+      document.getElementById('btn-speaker-ok').style.display = 'inline-flex';
+      document.getElementById('btn-speaker-no').style.display = 'inline-flex';
+      document.getElementById('speaker-hint').style.display = 'none';
+    };
+  }
+
+  function animateToneBars(playing) {
+    const heights = [6, 14, 22, 28, 32, 28, 22, 14, 6];
+    if (toneAnim) clearInterval(toneAnim);
+    if (!playing) {
+      heights.forEach((h, i) => {
+        const b = document.getElementById('tb' + i);
+        b.className = 'tone-bar';
+        b.style.height = h + 'px';
+      });
+      return;
+    }
+    toneAnim = setInterval(() => {
+      heights.forEach((h, i) => {
+        const b = document.getElementById('tb' + i);
+        b.className = 'tone-bar playing';
+        b.style.height = Math.max(4, h + (Math.random() * 20 - 10)) + 'px';
+      });
+    }, 80);
+  }
+
+  function confirmSpeaker() {
+    speakerOk = true;
+    setStatus('speaker', 'Ready', 'ok');
+    setNum('speaker', true, false);
+    document.getElementById('card-speaker').classList.remove('active');
+    setTimeout(showAllSet, 400);
+  }
+
+  function speakerFail() {
+    setStatus('speaker', 'Check volume', 'err');
+    const hint = document.getElementById('speaker-hint');
+    hint.className = 'hint err';
+    hint.textContent = 'Make sure your volume is turned up and the correct output device is selected in your system settings.';
+    hint.style.display = 'block';
+    document.getElementById('btn-speaker-no').style.display = 'none';
+  }
+
+  function showAllSet() {
+    document.getElementById('main-page').style.display = 'none';
+    document.getElementById('allset-page').classList.add('show');
+    if (!speakerOk) document.getElementById('speaker-pill').textContent = 'Speaker check skipped';
+  }
+</script>
+</body>
+</html>
