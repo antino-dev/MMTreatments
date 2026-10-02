@@ -282,7 +282,6 @@ var PROMPTS = [
   function setHint() {
     if (busy) hint.textContent = "";
     else if (stagedKey && stagedDone) hint.textContent = "Press send to ask " + MATCHMAKER_NAME + ".";
-    else if (!pendingKey && !stagedKey && !ALLOW_FREE_TEXT) hint.textContent = "That's everything " + P.first + " has shared with " + MATCHMAKER_NAME + ".";
     else hint.textContent = "";
   }
 

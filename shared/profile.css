@@ -11,16 +11,16 @@ body { background: var(--bg); font-family: 'DM Sans', sans-serif; min-height: 10
 body.ai-on { padding-bottom: 88px; }
 button { font-family: 'DM Sans', sans-serif; }
 .desktop-shell { max-width: 800px; margin: 0 auto; }
-.name-header { padding: 0 0 19px 0; }
-.name-header h1 { font-size: 41.5px; font-weight: 600; color: var(--text-dark); letter-spacing: -0.015em; line-height: 1; }
-.name-header .name-sub { font-size: 17.5px; color: var(--text-dark); font-weight: 400; margin-top: 6.5px; letter-spacing: 0.01em; }
-.profile-grid { display: grid; grid-template-columns: 336px 1fr; gap: 16px; align-items: start; }
+.name-header { padding: 2px 2px 6px; }
+.name-header h1 { font-size: 34px; font-weight: 600; color: var(--text-dark); letter-spacing: -0.015em; line-height: 1; }
+.name-header .name-sub { font-size: 16px; color: var(--text-mid); font-weight: 400; margin-top: 6px; letter-spacing: 0.01em; }
+.profile-grid { display: grid; grid-template-columns: 269px 1fr; gap: 16px; align-items: start; }
 .col-left, .col-right { display: flex; flex-direction: column; gap: 13px; min-width: 0; }
 .card { background: var(--card); border-radius: 17.5px; overflow: hidden; box-shadow: 0 1px 5px rgba(0,0,0,0.07); }
 .video-card { position: relative; border-radius: 17.5px; overflow: hidden; background: #111; aspect-ratio: 1/1; width: 100%; cursor: pointer; }
 .video-card video { width: 100%; height: 100%; object-fit: cover; display: block; }
 .video-overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 64px 19px 19px; background: linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 100%); }
-.video-label { font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.75); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 6.5px; }
+.video-label { font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.75); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 6.5px; }
 .play-btn { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.18); backdrop-filter: blur(6.5px); border: 1px solid rgba(255,255,255,0.3); color: #fff; padding: 9px 17.5px; border-radius: 40px; font-size: 13px; font-weight: 500; cursor: pointer; transition: background 0.2s; }
 .play-btn:hover { background: rgba(255,255,255,0.28); }
 .play-btn svg { width: 14.5px; height: 14.5px; fill: #fff; }
@@ -28,16 +28,16 @@ button { font-family: 'DM Sans', sans-serif; }
 .info-row { display: flex; align-items: center; gap: 11px; color: var(--text-mid); font-size: 14.5px; font-weight: 400; letter-spacing: 0.01em; }
 .info-icon { width: 19px; height: 19px; flex-shrink: 0; opacity: 0.6; }
 .tag-card { background: var(--card); border-radius: 17.5px; box-shadow: 0 1px 5px rgba(0,0,0,0.07); padding: 17.5px 21px 16px; }
-.tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
-.tag { background: var(--accent-light); color: var(--accent); border-radius: 40px; padding: 7px 16px; font-size: 13px; font-weight: 500; letter-spacing: 0.01em; }
+.tag-row { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 8px; }
+.tag { background: var(--accent-light); color: var(--accent); border-radius: 40px; padding: 6px 12px; font-size: 13px; font-weight: 500; letter-spacing: 0.01em; }
 .prompt-card { padding: 21px 22.5px 22.5px; }
-.prompt-label { font-size: 12px; color: var(--text-dark); font-weight: 500; letter-spacing: 0.01em; margin-bottom: 8px; }
+.prompt-label { font-size: 13px; color: var(--text-dark); font-weight: 500; letter-spacing: 0.01em; margin-bottom: 8px; }
 .prompt-answer { font-size: 16px; font-weight: 400; color: var(--text-dark); line-height: 1.55; letter-spacing: 0.01em; }
 .prompt-answer.small { font-size: 16px; font-weight: 400; line-height: 1.55; color: var(--text-mid); letter-spacing: 0.01em; }
 
 /* Read more (profile-only expansion) */
 .prompt-more { margin-top: 9.5px; padding-top: 9.5px; border-top: 1px solid var(--border); font-size: 13.5px; }
-.read-more { margin-top: 9.5px; background: none; border: none; padding: 3px 0; color: var(--accent); font-size: 12px; font-weight: 600; cursor: pointer; letter-spacing: 0.01em; }
+.read-more { margin-top: 9.5px; background: none; border: none; padding: 3px 0; color: var(--accent); font-size: 13px; font-weight: 600; cursor: pointer; letter-spacing: 0.01em; }
 .read-more:hover { text-decoration: underline; }
 .read-more:focus-visible, .wm-ask:focus-visible, .action-wm:focus-visible,
 .wm-close:focus-visible, .wm-send:focus-visible, .action-like:focus-visible, .action-skip:focus-visible,
@@ -46,9 +46,9 @@ button { font-family: 'DM Sans', sans-serif; }
 /* Wingmate placeholder on target cards */
 .wm-note { margin-top: 11px; display: flex; align-items: center; gap: 9.5px; background: var(--wm-tint); border: 1px solid var(--wm-border); border-radius: 13px; padding: 9.5px 11px; }
 .prompt-label + .wm-note { margin-top: 3px; }
-.wm-note-text { flex: 1; display: flex; align-items: flex-start; gap: 6.5px; font-size: 12px; color: var(--text-mid); line-height: 1.4; }
+.wm-note-text { flex: 1; display: flex; align-items: flex-start; gap: 6.5px; font-size: 13px; color: var(--text-mid); line-height: 1.4; }
 .wm-spark { width: 14.5px; height: 14.5px; flex-shrink: 0; fill: var(--accent); margin-top: 1px; }
-.wm-ask { flex-shrink: 0; display: inline-flex; align-items: center; gap: 5px; background: var(--card); color: var(--accent); border: 1.5px solid var(--accent); border-radius: 40px; padding: 6.5px 11px; font-size: 11px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: background 0.15s; }
+.wm-ask { flex-shrink: 0; display: inline-flex; align-items: center; gap: 5px; background: var(--card); color: var(--accent); border: 1.5px solid var(--accent); border-radius: 40px; padding: 6.5px 11px; font-size: 12.5px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: background 0.15s; }
 .wm-ask:hover { background: var(--accent-light); }
 
 /* Action bar */
@@ -121,10 +121,13 @@ body.wm-locked { overflow: hidden; }
 
 /* Mobile / narrow iframe (e.g. 300px phone, 320px Qualtrics iframe) */
 @media (max-width: 760px) {
+  /* One narrow column (80% of the available width, as the profile image) so all elements share the same edges. */
+  :root { --col-w: max(calc((100vw - 26px) * 0.8), 290px); }
+  .desktop-shell { width: min(100%, var(--col-w)); }
   body { padding: 16px 13px 77px; }
   body.ai-on { padding-bottom: 120px; }
-  .name-header { padding-bottom: 13px; }
-  .name-header h1 { font-size: 29px; }
+  .name-header { padding: 0 2px 2px; }
+  .name-header h1 { font-size: 26px; }
   .name-header .name-sub { font-size: 14.5px; margin-top: 5px; }
   .profile-grid { grid-template-columns: 1fr; gap: 11px; }
   .col-left, .col-right { gap: 11px; }
@@ -134,19 +137,20 @@ body.wm-locked { overflow: hidden; }
   .info-icon { width: 17.5px; height: 17.5px; }
   .tag-card { padding: 14.5px 16px 13px; }
   .tag-row { gap: 6.5px; }
-  .tag { padding: 5.5px 11px; font-size: 11px; }
+  .tag { padding: 5.5px 11px; font-size: 12px; }
   .prompt-card { padding: 16px 16px 17.5px; }
-  .prompt-label { font-size: 11px; margin-bottom: 6.5px; }
+  .prompt-label { font-size: 13px; margin-bottom: 6.5px; }
   .prompt-answer, .prompt-answer.small { font-size: 14.5px; }
   .prompt-more { font-size: 13px; }
-  .wm-note { flex-wrap: wrap; padding: 9.5px; }
+  .wm-note { flex-wrap: wrap; padding: 9.5px 11px 11px; gap: 8px; }
+  .wm-note-text { flex-basis: 100%; }
   .wm-ask { margin-left: 21px; }
   .action-bar { padding: 8px 13px 11px; }
-  .action-bar-inner { flex-wrap: wrap; gap: 8px 9.5px; }
+  .action-bar-inner { flex-wrap: wrap; gap: 8px 9.5px; width: min(100%, var(--col-w)); }
   .action-skip, .action-star { width: 43px; height: 43px; }
   .action-skip svg, .action-star svg { width: 17.5px; height: 17.5px; }
   .action-like { height: 43px; font-size: 13px; gap: 6.5px; }
   .action-like svg { width: 16px; height: 16px; }
-  .action-wm { order: -1; flex: 1 1 100%; height: 35px; font-size: 12px; }
+  .action-wm { order: -1; flex: 1 1 100%; height: 35px; font-size: 13px; }
   .wm-sheet { height: min(86vh, 640px); }
 }
