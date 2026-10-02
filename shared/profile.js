@@ -15,7 +15,7 @@
 /* ---------- Config (rename here) ---------- */
 var APP_NAME = "Kindred";
 var MATCHMAKER_NAME = "Wingmate";
-var MATCHMAKER_TAGLINE = "your AI matchmaker";
+var MATCHMAKER_TAGLINE = APP_NAME + "'s AI matchmaker";  // neutral, platform-provided (never "{Name}'s matchmaker")
 var TYPING_MIN_MS = 800;
 var TYPING_MAX_MS = 1200;
 var AUTOTYPE_MS_PER_CHAR = 22;    // speed at which the participant's question is typed into the input
@@ -248,7 +248,7 @@ var PROMPTS = [
   var form = layer.querySelector(".wm-form");
   var input = layer.querySelector(".wm-input");
   var sendBtn = layer.querySelector(".wm-send");
-  layer.querySelector("#wmTitle").textContent = MATCHMAKER_NAME + " · " + P.first + "'s AI matchmaker";
+  layer.querySelector("#wmTitle").textContent = MATCHMAKER_NAME + " · " + MATCHMAKER_TAGLINE;
   layer.querySelector("#wmSub").textContent = "Answers using what " + P.first + " has shared. Only shares what " + P.first + " has approved.";
   layer.querySelector('label[for="wmInput"]').textContent = "Your question for " + MATCHMAKER_NAME;
   input.readOnly = !ALLOW_FREE_TEXT;
@@ -383,7 +383,7 @@ var PROMPTS = [
     sheet.focus();
     if (!greeted) {
       greeted = true;
-      addMsg("bot", "Hi! I'm " + MATCHMAKER_NAME + ", " + P.first + "'s matchmaker. I can tell you more about what " + P.first + " has shared with me.");
+      addMsg("bot", "Hi! I'm " + MATCHMAKER_NAME + ", " + MATCHMAKER_TAGLINE + ". I can tell you more about what " + P.first + " has shared with me.");
     }
     log("sheet_open", { via: via });
     setTimeout(function () { refresh(via); }, 350); // start typing once the sheet has slid up
