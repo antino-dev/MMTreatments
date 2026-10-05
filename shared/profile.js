@@ -5,7 +5,7 @@
  *     pron: { she: "she", her: "her", him: "her" } }   // subject, possessive, object
  *
  * URL parameter ?AI= selects the condition:
- *   0 (default, missing or invalid) – profile only; "Read more" expands every card
+ *   0 (default, missing or invalid) – profile only; every card shows its full details ("Show less" collapses)
  *   1 – target cards show the short answer; details only via the matchmaker
  *   2 – target cards show only the title; short + details only via the matchmaker
  *
@@ -14,12 +14,12 @@
 
 /* ---------- Config (rename here) ---------- */
 var APP_NAME = "Kindred";
-var MATCHMAKER_NAME = "Wingmate";
-var MATCHMAKER_TAGLINE = APP_NAME + "'s AI matchmaker";  // neutral, platform-provided (never "{Name}'s matchmaker")
+var MATCHMAKER_NAME = "Matchmaker";
+var MATCHMAKER_TAGLINE = "AI by " + APP_NAME;  // neutral, platform-provided (never "{Name}'s matchmaker")
 var TYPING_MIN_MS = 800;
 var TYPING_MAX_MS = 1200;
 var AUTOTYPE_MS_PER_CHAR = 22;    // speed at which the participant's question is typed into the input
-var AUTOTYPE_PAUSE_MS = 700;      // pause after a Wingmate reply before the next question starts typing
+var AUTOTYPE_PAUSE_MS = 700;      // pause after a Matchmaker reply before the next question starts typing
 var ALLOW_FREE_TEXT = false;      // false: input is read-only, participants only press Send on scripted questions
 
 /* ---------- Prompt cards (same for both personas, first person) ----------
@@ -135,10 +135,10 @@ var PROMPTS = [
     if (!viaMatchmaker) {
       var more = el("div", "prompt-answer small prompt-more", p.long);
       more.id = "more-" + p.key;
-      more.hidden = true;
-      var btn = el("button", "read-more", "Read more");
+      // Full details are shown by default; "Show less" collapses them.
+      var btn = el("button", "read-more", "Show less");
       btn.type = "button";
-      btn.setAttribute("aria-expanded", "false");
+      btn.setAttribute("aria-expanded", "true");
       btn.setAttribute("aria-controls", more.id);
       btn.addEventListener("click", function () {
         var open = more.hidden;
@@ -156,42 +156,11 @@ var PROMPTS = [
       txt.appendChild(el("span", "", COND === 2
         ? P.first + " shared this with " + MATCHMAKER_NAME + "."
         : P.first + " shared more about this with " + MATCHMAKER_NAME + "."));
-      var ask = el("button", "wm-ask", "Ask " + MATCHMAKER_NAME);
-      ask.type = "button";
-      ask.addEventListener("click", function () {
-        log("ask_wingmate_click", { from: "card", card: p.key, position: i + 1 });
-        askFromCard(p.key, ask);
-      });
       note.appendChild(txt);
-      note.appendChild(ask);
       card.appendChild(note);
     }
     list.appendChild(card);
   });
-
-  /* ---------- Video ---------- */
-  var video = document.getElementById("profileVideo");
-  var videoCard = document.getElementById("videoCard");
-  var playIcon = document.getElementById("playIcon");
-  var playText = document.getElementById("playText");
-  var playing = false;
-  function setPaused() {
-    playing = false;
-    playIcon.innerHTML = '<path d="M8 5v14l11-7z"/>';
-    playText.textContent = "Play video";
-  }
-  videoCard.addEventListener("click", function () {
-    if (!playing) {
-      video.play(); playing = true;
-      playIcon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
-      playText.textContent = "Pause";
-      log("video_play", null);
-    } else {
-      video.pause(); setPaused();
-      log("video_pause", null);
-    }
-  });
-  video.addEventListener("ended", function () { setPaused(); video.load(); log("video_ended", null); });
 
   /* ---------- Action bar ---------- */
   var likeBtn = document.getElementById("likeBtn");
@@ -213,7 +182,7 @@ var PROMPTS = [
   wmBtn.appendChild(el("span", "", "Ask " + MATCHMAKER_NAME + " about " + P.first));
   likeBtn.parentNode.insertBefore(wmBtn, likeBtn.nextSibling);
   wmBtn.addEventListener("click", function () {
-    log("ask_wingmate_click", { from: "action_bar" });
+    log("ask_matchmaker_click", { from: "action_bar" });
     openSheet(wmBtn, "action_bar");
   });
 
@@ -256,18 +225,17 @@ var PROMPTS = [
 
   /* ----- Scripted question flow -----
    * The participant's next question is autotyped into the input; they only press Send.
-   * Questions follow card order, except that "Ask Wingmate" on a card jumps to that card's question.
+   * Questions follow card order.
    */
   var TARGETS = PROMPTS.filter(function (p) { return p.target; });
   var byKey = {};
   PROMPTS.forEach(function (p) { byKey[p.key] = p; });
   var asked = {};          // key -> true once sent
-  var answerRow = {};      // key -> Wingmate reply element
   var pendingKey = null;   // question that should be in the input
   var stagedKey = null;    // question currently (being) typed into the input
   var stagedDone = false;  // autotype for stagedKey has finished
   var typeTimer = null;
-  var busy = false;        // waiting for a Wingmate reply
+  var busy = false;        // waiting for a Matchmaker reply
 
   function nextUnasked() {
     for (var j = 0; j < TARGETS.length; j++) if (!asked[TARGETS[j].key]) return TARGETS[j].key;
@@ -328,19 +296,6 @@ var PROMPTS = [
     stage(pendingKey, trigger);
   }
 
-  function askFromCard(key, btn) {
-    if (!asked[key]) pendingKey = key;
-    openSheet(btn, "card:" + key);
-    if (asked[key] && answerRow[key]) {
-      var row = answerRow[key];
-      setTimeout(function () {
-        row.scrollIntoView({ block: "center", behavior: "smooth" });
-        row.classList.add("flash");
-        setTimeout(function () { row.classList.remove("flash"); }, 1500);
-      }, 320);
-    }
-  }
-
   function submit(via) {
     if (busy || sendBtn.disabled) return;
     var typed = input.value.trim();
@@ -382,7 +337,7 @@ var PROMPTS = [
     sheet.focus();
     if (!greeted) {
       greeted = true;
-      addMsg("bot", "Hi! I'm " + MATCHMAKER_NAME + ", " + MATCHMAKER_TAGLINE + ". I can tell you more about what " + P.first + " has shared with me.");
+      addMsg("bot", "Hi! I'm " + APP_NAME + "'s AI " + MATCHMAKER_NAME + ". I can tell you more about what " + P.first + " has shared with me.");
     }
     log("sheet_open", { via: via });
     setTimeout(function () { refresh(via); }, 350); // start typing once the sheet has slid up
@@ -471,8 +426,7 @@ var PROMPTS = [
     var delay = TYPING_MIN_MS + Math.random() * (TYPING_MAX_MS - TYPING_MIN_MS);
     setTimeout(function () {
       typing.remove();
-      var row = addMsg("bot", a.text);
-      if (a.target) answerRow[a.matched] = row;
+      addMsg("bot", a.text);
       log("reply_shown", { matched: a.matched, target: !!a.target, text: a.text });
       busy = false;
       updateSend();

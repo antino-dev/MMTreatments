@@ -1,19 +1,19 @@
 # MMTreatments
 
-Static dating-profile stimuli (fictional app "Kindred", AI matchmaker "Wingmate").
+Static dating-profile stimuli (fictional app "Kindred", AI "Matchmaker").
 
 ## Pages
 
 - `olivia/olivia_profile.html?AI=0|1|2`
 - `ethan/ethan_profile.html?AI=0|1|2`
 
-`AI=0` (default if missing/invalid): profile only, every card has "Read more".
-`AI=1`: target cards (family plans, relationship goal, achievement) show the short answer; details only via Wingmate.
-`AI=2`: target cards show only the prompt title; short answer + details only via Wingmate.
+`AI=0` (default if missing/invalid): profile only, every card shows its full details ("Show less" collapses, "Read more" re-expands).
+`AI=1`: target cards (family plans, relationship goal, achievement) show the short answer; details only via the Matchmaker.
+`AI=2`: target cards show only the prompt title; short answer + details only via the Matchmaker.
 
 In AI=1/2 the participant's questions are scripted: each one is autotyped into a read-only input and the participant presses Send. Set `ALLOW_FREE_TEXT = true` in `shared/profile.js` to let participants type their own questions instead.
 
-Card content, scripted questions and replies, keyword matching, and the `APP_NAME` / `MATCHMAKER_NAME` constants live in `shared/profile.js`. Styles are in `shared/profile.css`. Persona basics (name, photo/video, job, height, interests) stay in each persona's HTML.
+Card content, scripted questions and replies, keyword matching, and the `APP_NAME` / `MATCHMAKER_NAME` constants live in `shared/profile.js`. Styles are in `shared/profile.css`. Persona basics (name, photo, job, height, interests) stay in each persona's HTML.
 
 ## Logging
 
@@ -23,7 +23,7 @@ Every interaction is sent to the parent frame and the console:
 { source: "profile-stim", condition, persona, event, detail, t }
 ```
 
-Events: `page_load`, `card_expand`, `card_collapse`, `ask_wingmate_click`, `sheet_open`, `sheet_close`, `question_autotyped`, `question_sent`, `reply_shown`, `like_click`, `skip_click`, `star_click`, `video_play`, `video_pause`, `video_ended`.
+Events: `page_load`, `card_expand`, `card_collapse`, `ask_matchmaker_click`, `sheet_open`, `sheet_close`, `question_autotyped`, `question_sent`, `reply_shown`, `like_click`, `skip_click`, `star_click`.
 
 Example Qualtrics question JavaScript that stores the log in an embedded-data field `stimLog`:
 

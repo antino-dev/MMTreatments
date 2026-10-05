@@ -1,5 +1,5 @@
 /* Shared profile styles (Kindred). Base styles carried over from the original
-   persona pages; matchmaker (Wingmate) and mobile styles added below. */
+   persona pages; matchmaker and mobile styles added below. */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 :root {
   --bg: #f5f2ed; --card: #ffffff; --text-dark: #1a1612;
@@ -17,13 +17,8 @@ button { font-family: 'DM Sans', sans-serif; }
 .profile-grid { display: grid; grid-template-columns: 269px 1fr; gap: 16px; align-items: start; }
 .col-left, .col-right { display: flex; flex-direction: column; gap: 13px; min-width: 0; }
 .card { background: var(--card); border-radius: 17.5px; overflow: hidden; box-shadow: 0 1px 5px rgba(0,0,0,0.07); }
-.video-card { position: relative; border-radius: 17.5px; overflow: hidden; background: #111; aspect-ratio: 1/1; width: 100%; cursor: pointer; }
-.video-card video { width: 100%; height: 100%; object-fit: cover; display: block; }
-.video-overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 64px 19px 19px; background: linear-gradient(to top, rgba(0,0,0,0.65) 0%, transparent 100%); }
-.video-label { font-size: 12px; font-weight: 500; color: rgba(255,255,255,0.75); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 6.5px; }
-.play-btn { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.18); backdrop-filter: blur(6.5px); border: 1px solid rgba(255,255,255,0.3); color: #fff; padding: 9px 17.5px; border-radius: 40px; font-size: 13px; font-weight: 500; cursor: pointer; transition: background 0.2s; }
-.play-btn:hover { background: rgba(255,255,255,0.28); }
-.play-btn svg { width: 14.5px; height: 14.5px; fill: #fff; }
+.photo-card { aspect-ratio: 1/1; width: 100%; background: #e9e4dc; }
+.photo-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .info-strip { padding: 17.5px 21px; display: flex; flex-direction: column; gap: 11px; background: var(--card); border-radius: 17.5px; box-shadow: 0 1px 5px rgba(0,0,0,0.07); }
 .info-row { display: flex; align-items: center; gap: 11px; color: var(--text-mid); font-size: 14.5px; font-weight: 400; letter-spacing: 0.01em; }
 .info-icon { width: 19px; height: 19px; flex-shrink: 0; opacity: 0.6; }
@@ -39,17 +34,15 @@ button { font-family: 'DM Sans', sans-serif; }
 .prompt-more { margin-top: 9.5px; padding-top: 9.5px; border-top: 1px solid var(--border); font-size: 13.5px; }
 .read-more { margin-top: 9.5px; background: none; border: none; padding: 3px 0; color: var(--accent); font-size: 13px; font-weight: 600; cursor: pointer; letter-spacing: 0.01em; }
 .read-more:hover { text-decoration: underline; }
-.read-more:focus-visible, .wm-ask:focus-visible, .action-wm:focus-visible,
+.read-more:focus-visible, .action-wm:focus-visible,
 .wm-close:focus-visible, .wm-send:focus-visible, .action-like:focus-visible, .action-skip:focus-visible,
-.action-star:focus-visible, .play-btn:focus-visible { outline: 2.5px solid rgba(108,63,163,0.45); outline-offset: 2px; }
+.action-star:focus-visible { outline: 2.5px solid rgba(108,63,163,0.45); outline-offset: 2px; }
 
-/* Wingmate placeholder on target cards */
+/* Matchmaker note on target cards */
 .wm-note { margin-top: 11px; display: flex; align-items: center; gap: 9.5px; background: var(--wm-tint); border: 1px solid var(--wm-border); border-radius: 13px; padding: 9.5px 11px; }
 .prompt-label + .wm-note { margin-top: 3px; }
 .wm-note-text { flex: 1; display: flex; align-items: flex-start; gap: 6.5px; font-size: 13px; color: var(--text-mid); line-height: 1.4; }
 .wm-spark { width: 14.5px; height: 14.5px; flex-shrink: 0; fill: var(--accent); margin-top: 1px; }
-.wm-ask { flex-shrink: 0; display: inline-flex; align-items: center; gap: 5px; background: var(--card); color: var(--accent); border: 1.5px solid var(--accent); border-radius: 40px; padding: 6.5px 11px; font-size: 12.5px; font-weight: 600; cursor: pointer; white-space: nowrap; transition: background 0.15s; }
-.wm-ask:hover { background: var(--accent-light); }
 
 /* Action bar */
 .action-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg); border-top: 1px solid var(--border); padding: 13px 19px 16px; display: flex; justify-content: center; z-index: 200; }
@@ -68,7 +61,7 @@ button { font-family: 'DM Sans', sans-serif; }
 .action-wm:hover { background: var(--wm-tint); }
 .action-wm .wm-spark { margin-top: 0; }
 
-/* Wingmate bottom sheet */
+/* Matchmaker bottom sheet */
 .wm-layer { position: fixed; inset: 0; z-index: 400; }
 .wm-layer[hidden] { display: none; }
 .wm-backdrop { position: absolute; inset: 0; background: rgba(26,22,18,0.38); opacity: 0; transition: opacity 0.25s; }
@@ -109,7 +102,6 @@ button { font-family: 'DM Sans', sans-serif; }
 @keyframes wm-pulse { 0% { box-shadow: 0 0 0 0 rgba(108,63,163,0.45); } 70% { box-shadow: 0 0 0 9px rgba(108,63,163,0); } 100% { box-shadow: 0 0 0 0 rgba(108,63,163,0); } }
 .wm-send svg { width: 16px; height: 16px; fill: #fff; }
 .wm-hint { font-size: 12.5px; color: var(--text-light); margin: 0 0 6px 4px; min-height: 14px; }
-.wm-msg.flash .wm-bubble { box-shadow: 0 0 0 2px var(--accent); transition: box-shadow 0.3s; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
 body.wm-locked { overflow: hidden; }
 
@@ -131,7 +123,6 @@ body.wm-locked { overflow: hidden; }
   .name-header .name-sub { font-size: 14.5px; margin-top: 5px; }
   .profile-grid { grid-template-columns: 1fr; gap: 11px; }
   .col-left, .col-right { gap: 11px; }
-  .video-overlay { padding: 48px 14.5px 14.5px; }
   .info-strip { padding: 14.5px 16px; gap: 9.5px; }
   .info-row { font-size: 13px; gap: 9.5px; }
   .info-icon { width: 17.5px; height: 17.5px; }
@@ -142,9 +133,7 @@ body.wm-locked { overflow: hidden; }
   .prompt-label { font-size: 13px; margin-bottom: 6.5px; }
   .prompt-answer, .prompt-answer.small { font-size: 14.5px; }
   .prompt-more { font-size: 13px; }
-  .wm-note { flex-wrap: wrap; padding: 9.5px 11px 11px; gap: 8px; }
-  .wm-note-text { flex-basis: 100%; }
-  .wm-ask { margin-left: 21px; }
+  .wm-note { padding: 9.5px 11px; }
   .action-bar { padding: 8px 13px 11px; }
   .action-bar-inner { flex-wrap: wrap; gap: 8px 9.5px; width: min(100%, var(--col-w)); }
   .action-skip, .action-star { width: 43px; height: 43px; }
