@@ -7,7 +7,7 @@ Static dating-profile stimuli (fictional app "Kindred", AI "Matchmaker").
 - `olivia/olivia_profile.html?AI=0|1|2`
 - `ethan/ethan_profile.html?AI=0|1|2`
 
-Four cards (Family Plans, Passions & Lifestyle, Career, Past Relationships), each with a short answer and details; all four are manipulated. Content is identical for both personas.
+Five cards, in this order: Family Plans, Past Relationships, Career, Hobbies, Passions & Lifestyle. Each has a short answer and details; content is identical for both personas. "Hobbies" is the control card and looks the same in every condition; the other four are manipulated:
 
 `AI=0` (default if missing/invalid): profile only, every card shows the short answer and the details ("Show less" hides the details, "Read more" restores them).
 `AI=1`: each card shows the short answer; details only via the Matchmaker.

@@ -46,14 +46,14 @@ var PROMPTS = [
     reply2: "Yes, {Name} wants children. {She}'d like to be engaged in the next couple of years and start a family by {her} early thirties, ideally with two or three kids. {She}'s looking for someone who's sure they want kids and who'd want to split parenting equally."
   },
   {
-    key: "passions", target: true,
-    title: "Passions & Lifestyle",
-    short: "Volunteering",
-    long: "I've tutored at a youth literacy program every Saturday morning for five years, and last year they named me volunteer of the year. A few of the kids I started with are now reading at grade level, and honestly that means more to me than anything I've done at work.",
-    question: "I'd love to know what {Name} is passionate about. How does {she} like to spend {her} time?",
-    keywords: ["passion", "interest", "hobb", "volunteer", "tutor", "literacy", "free time", "for fun", "lifestyle", "saturday", "weekend", "give back", "giving back", "~community"],
-    reply1: "{Name} has tutored at a youth literacy program every Saturday morning for five years, and last year {she} was named volunteer of the year. A few of the kids {she} started with are now reading at grade level, and {she} says that means more to {him} than anything {she}'s done at work.",
-    reply2: "{Name}'s big passion is volunteering. {She}'s tutored at a youth literacy program every Saturday morning for five years, and last year {she} was named volunteer of the year. A few of the kids {she} started with are now reading at grade level, and {she} says that means more to {him} than anything {she}'s done at work."
+    key: "past", target: true,
+    title: "Past Relationships",
+    short: "Back to dating after a long-term relationship",
+    long: "I was engaged until two years ago; we called it off a few months before the wedding. It was mutual, but it took me a while to feel ready again. It taught me what I need most in a relationship, which is honest communication, and I'm ready to meet someone now.",
+    question: "{Name} mentioned {her} past relationships. What's {her} story there?",
+    keywords: ["relationship", "\\bex\\b", "engage", "wedding", "\\blast\\b", "\\bpast\\b", "broke up", "break ?up", "called it off", "divorc", "single", "~dating"],
+    reply1: "{Name} was engaged until two years ago, and they called it off a few months before the wedding. It was mutual, but it took {him} a while to feel ready again. It taught {him} that what {she} needs most in a relationship is honest communication, and {she}'s ready to meet someone now.",
+    reply2: "{Name} is back to dating after a long-term relationship. {She} was engaged until two years ago, and they called it off a few months before the wedding. It was mutual, but it took {him} a while to feel ready again. It taught {him} that what {she} needs most in a relationship is honest communication, and {she}'s ready to meet someone now."
   },
   {
     key: "career", target: true,
@@ -66,14 +66,22 @@ var PROMPTS = [
     reply2: "{Name} is a product manager in tech. {She} was promoted last year to lead a product team of 12, one of the youngest managers at {her} company. Launch seasons can mean 60-hour weeks, and {she}'s aiming for a director role in the next few years, so {she} needs someone who won't take it personally when work gets intense."
   },
   {
-    key: "past", target: true,
-    title: "Past Relationships",
-    short: "Back to dating after a long-term relationship",
-    long: "I was engaged until two years ago; we called it off a few months before the wedding. It was mutual, but it took me a while to feel ready again. It taught me what I need most in a relationship, which is honest communication, and I'm ready to meet someone now.",
-    question: "{Name} mentioned {her} past relationships. What's {her} story there?",
-    keywords: ["relationship", "\\bex\\b", "engage", "wedding", "\\blast\\b", "\\bpast\\b", "broke up", "break ?up", "called it off", "divorc", "single", "~dating"],
-    reply1: "{Name} was engaged until two years ago, and they called it off a few months before the wedding. It was mutual, but it took {him} a while to feel ready again. It taught {him} that what {she} needs most in a relationship is honest communication, and {she}'s ready to meet someone now.",
-    reply2: "{Name} is back to dating after a long-term relationship. {She} was engaged until two years ago, and they called it off a few months before the wedding. It was mutual, but it took {him} a while to feel ready again. It taught {him} that what {she} needs most in a relationship is honest communication, and {she}'s ready to meet someone now."
+    // Control card: identical in every condition, never routed through the matchmaker.
+    key: "hobbies", target: false,
+    title: "Hobbies",
+    short: "Outdoors on Saturday afternoons, slow Sundays.",
+    long: "Saturday afternoons I'm usually hiking or at the farmers' market with friends. Sundays I keep free: coffee, a long run, and cooking for the week.",
+    keywords: ["hobb", "hik", "farmers", "market", "outdoor", "sunday", "~coffee", "running", "\\brun\\b", "cook"]
+  },
+  {
+    key: "passions", target: true,
+    title: "Passions & Lifestyle",
+    short: "Volunteering",
+    long: "I've tutored at a youth literacy program every Saturday morning for five years, and last year they named me volunteer of the year. A few of the kids I started with are now reading at grade level, and honestly that means more to me than anything I've done at work.",
+    question: "I'd love to know what {Name} is passionate about. How does {she} like to spend {her} time?",
+    keywords: ["passion", "interest", "volunteer", "tutor", "literacy", "free time", "for fun", "lifestyle", "saturday", "weekend", "give back", "giving back", "~community"],
+    reply1: "{Name} has tutored at a youth literacy program every Saturday morning for five years, and last year {she} was named volunteer of the year. A few of the kids {she} started with are now reading at grade level, and {she} says that means more to {him} than anything {she}'s done at work.",
+    reply2: "{Name}'s big passion is volunteering. {She}'s tutored at a youth literacy program every Saturday morning for five years, and last year {she} was named volunteer of the year. A few of the kids {she} started with are now reading at grade level, and {she} says that means more to {him} than anything {she}'s done at work."
   }
 ];
 
