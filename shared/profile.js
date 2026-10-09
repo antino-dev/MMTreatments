@@ -2,7 +2,8 @@
  *
  * Each persona page defines window.PROFILE before loading this file:
  *   { id: "olivia", first: "Olivia", full: "Olivia Carter",
- *     pron: { she: "she", her: "her", him: "her" } }   // subject, possessive, object
+ *     pron: { she: "she", her: "her", him: "her" },   // subject, possessive, object
+ *     prompts: [...] }               // optional: page-specific cards replacing the default PROMPTS below
  *
  * URL parameter ?AI= selects the condition:
  *   0 (default, missing or invalid) – profile only; every card shows its short answer and details ("Show less" hides the details)
@@ -38,52 +39,55 @@ var PROMPTS = [
   {
     key: "family", target: true,
     title: "Family Plans",
-    short: "Want children",
+    short: "I'd love to have a family of my own someday.",
     long: "I'd like to be engaged in the next couple of years and start a family by my early thirties, ideally two or three kids. I'm looking for someone who's sure they want kids and who'd want to split parenting equally.",
     question: "So {Name} told you about {her} family plans. I'm curious, does {she} want kids?",
     keywords: ["kid", "child", "famil", "bab(y|ies)", "\\bparent", "\\bmoms?\\b", "\\bdads?\\b", "mother", "father", "thirties", "engaged", "~future"],
     reply1: "{Name} would like to be engaged in the next couple of years and start a family by {her} early thirties, ideally with two or three kids. {She}'s looking for someone who's sure they want kids and who'd want to split parenting equally.",
-    reply2: "Yes, {Name} wants children. {She}'d like to be engaged in the next couple of years and start a family by {her} early thirties, ideally with two or three kids. {She}'s looking for someone who's sure they want kids and who'd want to split parenting equally."
+    reply2: "{Name} would love to have a family of {her} own someday. {She}'d like to be engaged in the next couple of years and start a family by {her} early thirties, ideally with two or three kids. {She}'s looking for someone who's sure they want kids and who'd want to split parenting equally."
   },
   {
     key: "past", target: true,
     title: "Past Relationships",
-    short: "Back to dating after a long-term relationship",
+    short: "Back to dating after a long-term relationship, and excited to meet someone new.",
     long: "I was engaged until two years ago; we called it off a few months before the wedding. It was mutual, but it took me a while to feel ready again. It taught me what I need most in a relationship, which is honest communication, and I'm ready to meet someone now.",
     question: "{Name} mentioned {her} past relationships. What's {her} story there?",
     keywords: ["relationship", "\\bex\\b", "engage", "wedding", "\\blast\\b", "\\bpast\\b", "broke up", "break ?up", "called it off", "divorc", "single", "~dating"],
     reply1: "{Name} was engaged until two years ago, and they called it off a few months before the wedding. It was mutual, but it took {him} a while to feel ready again. It taught {him} that what {she} needs most in a relationship is honest communication, and {she}'s ready to meet someone now.",
-    reply2: "{Name} is back to dating after a long-term relationship. {She} was engaged until two years ago, and they called it off a few months before the wedding. It was mutual, but it took {him} a while to feel ready again. It taught {him} that what {she} needs most in a relationship is honest communication, and {she}'s ready to meet someone now."
+    reply2: "{Name} is back to dating after a long-term relationship, and excited to meet someone new. {She} was engaged until two years ago, and they called it off a few months before the wedding. It was mutual, but it took {him} a while to feel ready again. It taught {him} that what {she} needs most in a relationship is honest communication, and {she}'s ready to meet someone now."
   },
   {
     key: "career", target: true,
     title: "Career",
-    short: "Product Manager · Tech",
+    short: "I'm a product manager in tech and I really enjoy what I do.",
     long: "I was promoted last year to lead a product team of 12, one of the youngest managers at my company. Launch seasons can mean 60-hour weeks, and I'm aiming for a director role in the next few years, so I need someone who won't take it personally when work gets intense.",
     question: "What's {Name}'s work life like? I'm curious how busy {she} gets.",
     keywords: ["~work", "\\bjob", "career", "promot", "product", "manager", "\\btech", "\\bteam", "busy", "hours", "director", "ambiti", "profession"],
     reply1: "{Name} was promoted last year to lead a product team of 12, one of the youngest managers at {her} company. Launch seasons can mean 60-hour weeks, and {she}'s aiming for a director role in the next few years, so {she} needs someone who won't take it personally when work gets intense.",
-    reply2: "{Name} is a product manager in tech. {She} was promoted last year to lead a product team of 12, one of the youngest managers at {her} company. Launch seasons can mean 60-hour weeks, and {she}'s aiming for a director role in the next few years, so {she} needs someone who won't take it personally when work gets intense."
+    reply2: "{Name} is a product manager in tech and really enjoys what {she} does. {She} was promoted last year to lead a product team of 12, one of the youngest managers at {her} company. Launch seasons can mean 60-hour weeks, and {she}'s aiming for a director role in the next few years, so {she} needs someone who won't take it personally when work gets intense."
   },
   {
     // Control card: identical in every condition, never routed through the matchmaker.
     key: "hobbies", target: false,
     title: "Hobbies",
-    short: "Outdoors on Saturday afternoons, slow Sundays.",
+    short: "You'll find me outdoors on Saturdays and taking it slow on Sundays.",
     long: "Saturday afternoons I'm usually hiking or at the farmers' market with friends. Sundays I keep free: coffee, a long run, and cooking for the week.",
     keywords: ["hobb", "hik", "farmers", "market", "outdoor", "sunday", "~coffee", "running", "\\brun\\b", "cook"]
   },
   {
     key: "passions", target: true,
     title: "Passions & Lifestyle",
-    short: "Volunteering",
+    short: "Giving back to my community is a big part of my life.",
     long: "I've tutored at a youth literacy program every Saturday morning for five years, and last year they named me volunteer of the year. A few of the kids I started with are now reading at grade level, and honestly that means more to me than anything I've done at work.",
     question: "I'd love to know what {Name} is passionate about. How does {she} like to spend {her} time?",
     keywords: ["passion", "interest", "volunteer", "tutor", "literacy", "free time", "for fun", "lifestyle", "saturday", "weekend", "give back", "giving back", "~community"],
     reply1: "{Name} has tutored at a youth literacy program every Saturday morning for five years, and last year {she} was named volunteer of the year. A few of the kids {she} started with are now reading at grade level, and {she} says that means more to {him} than anything {she}'s done at work.",
-    reply2: "{Name}'s big passion is volunteering. {She}'s tutored at a youth literacy program every Saturday morning for five years, and last year {she} was named volunteer of the year. A few of the kids {she} started with are now reading at grade level, and {she} says that means more to {him} than anything {she}'s done at work."
+    reply2: "For {Name}, giving back to {her} community is a big part of life. {She}'s tutored at a youth literacy program every Saturday morning for five years, and last year {she} was named volunteer of the year. A few of the kids {she} started with are now reading at grade level, and {she} says that means more to {him} than anything {she}'s done at work."
   }
 ];
+
+// A page may supply its own cards (same format) via window.PROFILE.prompts, e.g. the tutorial profile.
+if (window.PROFILE && window.PROFILE.prompts) PROMPTS = window.PROFILE.prompts;
 
 /* ---------- Setup ---------- */
 (function () {

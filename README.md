@@ -6,6 +6,7 @@ Static dating-profile stimuli (fictional app "Kindred", AI "Matchmaker").
 
 - `olivia/olivia_profile.html?AI=0|1|2`
 - `ethan/ethan_profile.html?AI=0|1|2`
+- `tutorial/john_profile.html?AI=0|1|2` (tutorial: same layout and conditions, its own neutral card content, defined in the page via `PROFILE.prompts`)
 
 Five cards, in this order: Family Plans, Past Relationships, Career, Hobbies, Passions & Lifestyle. Each has a short answer and details; content is identical for both personas. "Hobbies" is the control card and looks the same in every condition; the other four are manipulated:
 
