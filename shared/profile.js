@@ -5,9 +5,9 @@
  *     pron: { she: "she", her: "her", him: "her" } }   // subject, possessive, object
  *
  * URL parameter ?AI= selects the condition:
- *   0 (default, missing or invalid) – profile only; every card shows its full details ("Show less" collapses)
+ *   0 (default, missing or invalid) – profile only; every card shows its short answer and details ("Show less" hides the details)
  *   1 – target cards show the short answer; details only via the matchmaker
- *   2 – target cards show only the title; short + details only via the matchmaker
+ *   2 – target cards show only the title; short answer + details only via the matchmaker
  *
  * No storage, no network calls. Every interaction is posted to the parent frame.
  */
@@ -18,67 +18,62 @@ var MATCHMAKER_NAME = "Matchmaker";
 var MATCHMAKER_TAGLINE = "AI by " + APP_NAME;  // neutral, platform-provided (never "{Name}'s matchmaker")
 var TYPING_MIN_MS = 800;
 var TYPING_MAX_MS = 1200;
+var SENTENCE_GAP_MIN_MS = 700;    // typing pause before each further sentence of a Matchmaker reply
+var SENTENCE_GAP_MAX_MS = 1100;
 var AUTOTYPE_MS_PER_CHAR = 22;    // speed at which the participant's question is typed into the input
 var AUTOTYPE_PAUSE_MS = 700;      // pause after a Matchmaker reply before the next question starts typing
 var ALLOW_FREE_TEXT = false;      // false: input is read-only, participants only press Send on scripted questions
 
-/* ---------- Prompt cards (same for both personas, first person) ----------
+/* ---------- Prompt cards (first person; identical for both personas) ----------
+ * short: shown on the card in AI=0 and AI=1          long: the details
+ *   AI=0: short + long ("Show less" hides long)   AI=1: short on card, long via the matchmaker
+ *   AI=2: title only, short + long via the matchmaker
+ * A field may be a string or { olivia: "...", ethan: "..." } for persona-specific text.
  * target: true  -> handled by the matchmaker in AI=1 / AI=2
  * question: scripted participant question, autotyped into the input ({She}/{she}/{her}/{him}/{Name} filled per persona)
- * keywords: free-text matching regexes; a leading "~" marks a generic word worth half a match
- * reply1 / reply2: scripted matchmaker replies for AI=1 / AI=2
+ * keywords: free-text matching regexes (only used when ALLOW_FREE_TEXT); a leading "~" marks a generic word worth half a match
+ * reply1 / reply2: scripted matchmaker replies for AI=1 (long only) / AI=2 (short + long)
  */
 var PROMPTS = [
   {
-    key: "weekend", target: false,
-    title: "My ideal weekend",
-    short: "Outdoors on Saturday afternoons, slow Sundays.",
-    long: "Saturday afternoons I'm usually hiking or at the farmers' market with friends. Sundays I keep free: coffee, a long run, and cooking for the week.",
-    keywords: ["weekend", "sunday", "hik", "farmers", "market", "outdoor", "~coffee", "running", "\\brun\\b", "free time", "hobb", "for fun", "saturday afternoon"]
-  },
-  {
     key: "family", target: true,
-    title: "In five years, I hope…",
-    short: "To be starting a family.",
-    long: "I'd like to have kids in the next four or five years, ideally two. I'm close with my siblings and want that for my own kids. I'm flexible on timing and where we'd live.",
-    question: "So {Name} told you where {she} hopes to be in five years. I'm curious, does {she} want kids?",
-    keywords: ["kid", "child", "famil", "bab(y|ies)", "\\bsons?\\b", "daughter", "\\bparent", "\\bmoms?\\b", "\\bdads?\\b", "mother", "father", "sibling", "five years", "5 years", "~future"],
-    reply1: "{Name} would like to have kids in the next four or five years, ideally two. {She}'s close with {her} siblings and wants that for {her} own family, and is flexible on timing and where to live.",
-    reply2: "Yes, {Name} wants to start a family. {She}'d like to have kids in the next four or five years, ideally two. {She}'s close with {her} siblings and wants that for {her} own family, and is flexible on timing and where to live."
+    title: "Family Plans",
+    short: "Want children",
+    long: "I'd like to be engaged in the next couple of years and start a family by my early thirties, ideally two or three kids. I'm looking for someone who's sure they want kids and who'd want to split parenting equally.",
+    question: "So {Name} told you about {her} family plans. I'm curious, does {she} want kids?",
+    keywords: ["kid", "child", "famil", "bab(y|ies)", "\\bparent", "\\bmoms?\\b", "\\bdads?\\b", "mother", "father", "thirties", "engaged", "~future"],
+    reply1: "{Name} would like to be engaged in the next couple of years and start a family by {her} early thirties, ideally with two or three kids. {She}'s looking for someone who's sure they want kids and who'd want to split parenting equally.",
+    reply2: "Yes, {Name} wants children. {She}'d like to be engaged in the next couple of years and start a family by {her} early thirties, ideally with two or three kids. {She}'s looking for someone who's sure they want kids and who'd want to split parenting equally."
   },
   {
-    key: "goal", target: true,
-    title: "What I'm looking for",
-    short: "Something that leads to marriage.",
-    long: "I'm not here to date casually. I want a partner I could see marrying in the next couple of years. I'm happy to take things slow, but that's the direction.",
-    question: "I'd love to know what {Name} is hoping to find on here. What kind of relationship is {she} looking for?",
-    keywords: ["~looking", "relationship", "marr", "serious", "casual", "commit", "long[- ]term", "settle", "~partner", "wife", "husband", "hook ?up", "~dating", "\\bwant(s)? in\\b", "intention"],
-    reply1: "{Name} isn't looking for anything casual. {She} wants a partner {she} could see marrying in the next couple of years, and is happy to take things slow on the way there.",
-    reply2: "{Name} is looking for something that leads to marriage. {She} isn't interested in anything casual: {she} wants a partner {she} could see marrying in the next couple of years, and is happy to take things slow on the way there."
+    key: "passions", target: true,
+    title: "Passions & Lifestyle",
+    short: "Volunteering",
+    long: "I've tutored at a youth literacy program every Saturday morning for five years, and last year they named me volunteer of the year. A few of the kids I started with are now reading at grade level, and honestly that means more to me than anything I've done at work.",
+    question: "I'd love to know what {Name} is passionate about. How does {she} like to spend {her} time?",
+    keywords: ["passion", "interest", "hobb", "volunteer", "tutor", "literacy", "free time", "for fun", "lifestyle", "saturday", "weekend", "give back", "giving back", "~community"],
+    reply1: "{Name} has tutored at a youth literacy program every Saturday morning for five years, and last year {she} was named volunteer of the year. A few of the kids {she} started with are now reading at grade level, and {she} says that means more to {him} than anything {she}'s done at work.",
+    reply2: "{Name}'s big passion is volunteering. {She}'s tutored at a youth literacy program every Saturday morning for five years, and last year {she} was named volunteer of the year. A few of the kids {she} started with are now reading at grade level, and {she} says that means more to {him} than anything {she}'s done at work."
   },
   {
-    key: "food", target: false,
-    title: "Food I can't live without",
-    short: "Mostly vegetarian, never picky.",
-    long: "I don't cook meat at home, but I'm not strict when I'm out or at a friend's place. Happy to go anywhere for dinner.",
-    keywords: ["food", "\\beat", "vegetarian", "vegan", "meat", "diet", "picky", "dinner", "restaurant", "cuisine", "~cook"]
+    key: "career", target: true,
+    title: "Career",
+    short: "Product Manager · Tech",
+    long: "I was promoted last year to lead a product team of 12, one of the youngest managers at my company. Launch seasons can mean 60-hour weeks, and I'm aiming for a director role in the next few years, so I need someone who won't take it personally when work gets intense.",
+    question: "What's {Name}'s work life like? I'm curious how busy {she} gets.",
+    keywords: ["~work", "\\bjob", "career", "promot", "product", "manager", "\\btech", "\\bteam", "busy", "hours", "director", "ambiti", "profession"],
+    reply1: "{Name} was promoted last year to lead a product team of 12, one of the youngest managers at {her} company. Launch seasons can mean 60-hour weeks, and {she}'s aiming for a director role in the next few years, so {she} needs someone who won't take it personally when work gets intense.",
+    reply2: "{Name} is a product manager in tech. {She} was promoted last year to lead a product team of 12, one of the youngest managers at {her} company. Launch seasons can mean 60-hour weeks, and {she}'s aiming for a director role in the next few years, so {she} needs someone who won't take it personally when work gets intense."
   },
   {
-    key: "proud", target: true,
-    title: "Something I'm proud of",
-    short: "A project I led won a national award.",
-    long: "I was promoted this spring, and a project I led at work won a national industry award. I'm proud of it, but I'm working on not letting work take over my life.",
-    question: "{Name} mentioned something {she}'s proud of. What's the story there?",
-    keywords: ["proud", "~work", "\\bjob", "career", "award", "promot", "achiev", "accomplish", "~project", "success", "ambiti", "profession"],
-    reply1: "{Name} was promoted this spring, and a project {she} led won a national industry award. {She}'s proud of it, but tries not to let work take over.",
-    reply2: "{Name} is proud that a project {she} led won a national industry award, and {she} was also promoted this spring. {She}'s proud of it, but tries not to let work take over."
-  },
-  {
-    key: "volunteer", target: false,
-    title: "How I spend Saturday mornings",
-    short: "Volunteering at a homeless shelter.",
-    long: "I've helped at a shelter downtown most Saturday mornings for six years and now run the breakfast program. It's one of the most meaningful parts of my week.",
-    keywords: ["volunteer", "shelter", "homeless", "charit", "saturday morning", "breakfast", "give back", "giving back", "~community", "~meaningful"]
+    key: "past", target: true,
+    title: "Past Relationships",
+    short: "Back to dating after a long-term relationship",
+    long: "I was engaged until two years ago; we called it off a few months before the wedding. It was mutual, but it took me a while to feel ready again. It taught me what I need most in a relationship, which is honest communication, and I'm ready to meet someone now.",
+    question: "{Name} mentioned {her} past relationships. What's {her} story there?",
+    keywords: ["relationship", "\\bex\\b", "engage", "wedding", "\\blast\\b", "\\bpast\\b", "broke up", "break ?up", "called it off", "divorc", "single", "~dating"],
+    reply1: "{Name} was engaged until two years ago, and they called it off a few months before the wedding. It was mutual, but it took {him} a while to feel ready again. It taught {him} that what {she} needs most in a relationship is honest communication, and {she}'s ready to meet someone now.",
+    reply2: "{Name} is back to dating after a long-term relationship. {She} was engaged until two years ago, and they called it off a few months before the wedding. It was mutual, but it took {him} a while to feel ready again. It taught {him} that what {she} needs most in a relationship is honest communication, and {she}'s ready to meet someone now."
   }
 ];
 
@@ -98,6 +93,7 @@ var PROMPTS = [
     });
   }
   function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+  function pick(v) { return (v && typeof v === "object") ? v[P.id] : v; } // persona-specific text
 
   /* ---------- Logging ---------- */
   function log(event, detail) {
@@ -127,15 +123,13 @@ var PROMPTS = [
     card.appendChild(el("div", "prompt-label", p.title));
 
     var viaMatchmaker = p.target && COND > 0;
-
-    if (!(p.target && COND === 2)) {
-      card.appendChild(el("div", "prompt-answer", p.short));
-    }
+    var short = pick(p.short), long = pick(p.long);
 
     if (!viaMatchmaker) {
-      var more = el("div", "prompt-answer small prompt-more", p.long);
+      // Short answer + details shown by default; "Show less" hides the details.
+      card.appendChild(el("div", "prompt-answer", short));
+      var more = el("div", "prompt-answer small prompt-more", long);
       more.id = "more-" + p.key;
-      // Full details are shown by default; "Show less" collapses them.
       var btn = el("button", "read-more", "Show less");
       btn.type = "button";
       btn.setAttribute("aria-expanded", "true");
@@ -150,6 +144,7 @@ var PROMPTS = [
       card.appendChild(more);
       card.appendChild(btn);
     } else {
+      if (COND === 1) card.appendChild(el("div", "prompt-answer", short));
       var note = el("div", "wm-note");
       var txt = el("div", "wm-note-text");
       txt.innerHTML = SPARK;
@@ -409,8 +404,8 @@ var PROMPTS = [
 
   function answerFor(p) {
     if (!p) return { text: fill("{Name} hasn't shared that with me. You could ask {him} directly once you match."), matched: "none" };
-    if (!p.target) return { text: "That's on " + P.first + "'s profile: “" + p.short + "”", matched: p.key, target: false };
-    return { text: fill(COND === 2 ? p.reply2 : p.reply1), matched: p.key, target: true };
+    if (!p.target) return { text: "That's on " + P.first + "'s profile: “" + pick(p.short) + "”", matched: p.key, target: false };
+    return { text: fill(pick(COND === 2 ? p.reply2 : p.reply1)), matched: p.key, target: true };
   }
 
   function sendQuestion(text, source, cardKey, via) {
@@ -419,18 +414,29 @@ var PROMPTS = [
     addMsg("user", text);
     var a = answerFor(cardKey ? byKey[cardKey] : null);
     log("question_sent", { text: text, source: source, via: via, matched: a.matched, target: !!a.target });
-    var typing = el("div", "wm-msg bot");
-    typing.innerHTML = '<div class="wm-avatar sm" aria-hidden="true">' + AVATAR + '</div><div class="wm-bubble wm-typing" aria-label="' + MATCHMAKER_NAME + ' is typing"><span></span><span></span><span></span></div>';
-    logBox.appendChild(typing);
-    logBox.scrollTop = logBox.scrollHeight;
-    var delay = TYPING_MIN_MS + Math.random() * (TYPING_MAX_MS - TYPING_MIN_MS);
-    setTimeout(function () {
-      typing.remove();
-      addMsg("bot", a.text);
-      log("reply_shown", { matched: a.matched, target: !!a.target, text: a.text });
-      busy = false;
-      updateSend();
-      setTimeout(function () { refresh("after_reply"); }, AUTOTYPE_PAUSE_MS);
-    }, delay);
+    // Each sentence arrives as its own bubble, with a typing indicator before it.
+    var sentences = a.text.match(/[^.!?]+[.!?]+["”]?(\s+|$)/g) || [a.text];
+    sentences = sentences.map(function (x) { return x.trim(); });
+    var prevRow = null;
+    (function next(k) {
+      var typing = el("div", "wm-msg bot" + (k ? " cont" : ""));
+      typing.innerHTML = '<div class="wm-avatar sm" aria-hidden="true">' + AVATAR + '</div><div class="wm-bubble wm-typing" aria-label="' + MATCHMAKER_NAME + ' is typing"><span></span><span></span><span></span></div>';
+      if (prevRow) prevRow.querySelector(".wm-avatar").classList.add("ghost"); // avatar only beside the latest bubble
+      logBox.appendChild(typing);
+      logBox.scrollTop = logBox.scrollHeight;
+      var delay = k === 0
+        ? TYPING_MIN_MS + Math.random() * (TYPING_MAX_MS - TYPING_MIN_MS)
+        : SENTENCE_GAP_MIN_MS + Math.random() * (SENTENCE_GAP_MAX_MS - SENTENCE_GAP_MIN_MS);
+      setTimeout(function () {
+        typing.remove();
+        prevRow = addMsg("bot", sentences[k]);
+        if (k) prevRow.classList.add("cont");
+        if (k + 1 < sentences.length) { next(k + 1); return; }
+        log("reply_shown", { matched: a.matched, target: !!a.target, text: a.text, bubbles: sentences.length });
+        busy = false;
+        updateSend();
+        setTimeout(function () { refresh("after_reply"); }, AUTOTYPE_PAUSE_MS);
+      }, delay);
+    })(0);
   }
 })();

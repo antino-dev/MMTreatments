@@ -7,13 +7,15 @@ Static dating-profile stimuli (fictional app "Kindred", AI "Matchmaker").
 - `olivia/olivia_profile.html?AI=0|1|2`
 - `ethan/ethan_profile.html?AI=0|1|2`
 
-`AI=0` (default if missing/invalid): profile only, every card shows its full details ("Show less" collapses, "Read more" re-expands).
-`AI=1`: target cards (family plans, relationship goal, achievement) show the short answer; details only via the Matchmaker.
-`AI=2`: target cards show only the prompt title; short answer + details only via the Matchmaker.
+Four cards (Family Plans, Passions & Lifestyle, Career, Past Relationships), each with a short answer and details; all four are manipulated. Content is identical for both personas.
+
+`AI=0` (default if missing/invalid): profile only, every card shows the short answer and the details ("Show less" hides the details, "Read more" restores them).
+`AI=1`: each card shows the short answer; details only via the Matchmaker.
+`AI=2`: each card shows only its title; short answer + details only via the Matchmaker.
 
 In AI=1/2 the participant's questions are scripted: each one is autotyped into a read-only input and the participant presses Send. Set `ALLOW_FREE_TEXT = true` in `shared/profile.js` to let participants type their own questions instead.
 
-Card content, scripted questions and replies, keyword matching, and the `APP_NAME` / `MATCHMAKER_NAME` constants live in `shared/profile.js`. Styles are in `shared/profile.css`. Persona basics (name, photo, job, height, interests) stay in each persona's HTML.
+Card content, scripted questions and replies, keyword matching, and the `APP_NAME` / `MATCHMAKER_NAME` constants live in `shared/profile.js`. Styles are in `shared/profile.css`. Persona basics (name, age, city, height, photo, interests) stay in each persona's HTML.
 
 ## Logging
 
