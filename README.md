@@ -14,7 +14,7 @@ Five cards, in this order: Family Plans, Past Relationships, Career, Hobbies, Pa
 `AI=1`: each card shows the short answer; details only via the Matchmaker.
 `AI=2`: each card shows only its title; short answer + details only via the Matchmaker.
 
-In AI=1/2 the participant's questions are scripted: each one is autotyped into a read-only input and the participant presses Send. Set `ALLOW_FREE_TEXT = true` in `shared/profile.js` to let participants type their own questions instead.
+In AI=1/2 the participant's questions are scripted: each one is autotyped into a read-only input and the participant presses Send. After the Past Relationships answer, a scripted follow-up asks why the engagement was called off; the Matchmaker says the profile owner didn't share that and continues only with what was shared (logged with `matched: "past_followup", unshared: true`). Set `ALLOW_FREE_TEXT = true` in `shared/profile.js` to let participants type their own questions instead.
 
 Card content, scripted questions and replies, keyword matching, and the `APP_NAME` / `MATCHMAKER_NAME` constants live in `shared/profile.js`. Styles are in `shared/profile.css`. Persona basics (name, age, city, height, photo, interests) stay in each persona's HTML.
 

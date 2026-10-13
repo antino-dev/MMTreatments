@@ -34,6 +34,8 @@ var ALLOW_FREE_TEXT = false;      // false: input is read-only, participants onl
  * question: scripted participant question, autotyped into the input ({She}/{she}/{her}/{him}/{Name} filled per persona)
  * keywords: free-text matching regexes (only used when ALLOW_FREE_TEXT); a leading "~" marks a generic word worth half a match
  * reply1 / reply2: scripted matchmaker replies for AI=1 (long only) / AI=2 (short + long)
+ * followUp: optional { question, reply } asked right after the card's own question. Used to ask for something
+ *   the profile owner did NOT share; the reply says so and continues only with what was shared (same in AI=1 / AI=2).
  */
 var PROMPTS = [
   {
@@ -54,7 +56,11 @@ var PROMPTS = [
     question: "{Name} mentioned {her} past relationships. What's {her} story there?",
     keywords: ["relationship", "\\bex\\b", "engage", "wedding", "\\blast\\b", "\\bpast\\b", "broke up", "break ?up", "called it off", "divorc", "single", "~dating"],
     reply1: "{Name} was engaged until two years ago, and they called it off a few months before the wedding. It was mutual, but it took {him} a while to feel ready again. It taught {him} that what {she} needs most in a relationship is honest communication, and {she}'s ready to meet someone now.",
-    reply2: "{Name} is back to dating after a long-term relationship, and excited to meet someone new. {She} was engaged until two years ago, and they called it off a few months before the wedding. It was mutual, but it took {him} a while to feel ready again. It taught {him} that what {she} needs most in a relationship is honest communication, and {she}'s ready to meet someone now."
+    reply2: "{Name} is back to dating after a long-term relationship, and excited to meet someone new. {She} was engaged until two years ago, and they called it off a few months before the wedding. It was mutual, but it took {him} a while to feel ready again. It taught {him} that what {she} needs most in a relationship is honest communication, and {she}'s ready to meet someone now.",
+    followUp: {
+      question: "Oh, that must have been hard. Do you know why they called it off?",
+      reply: "Sorry, {Name} didn't tell me what happened there. {She} did say the decision was mutual, and that {she}'s ready to meet someone now."
+    }
   },
   {
     key: "career", target: true,
@@ -234,9 +240,19 @@ if (window.PROFILE && window.PROFILE.prompts) PROMPTS = window.PROFILE.prompts;
    * The participant's next question is autotyped into the input; they only press Send.
    * Questions follow card order.
    */
-  var TARGETS = PROMPTS.filter(function (p) { return p.target; });
+  // Scripted questions in order: each target card's question, followed by its follow-up (if any).
+  var TARGETS = [];
   var byKey = {};
-  PROMPTS.forEach(function (p) { byKey[p.key] = p; });
+  PROMPTS.forEach(function (p) {
+    byKey[p.key] = p;
+    if (!p.target) return;
+    TARGETS.push(p);
+    if (p.followUp) {
+      var f = { key: p.key + "_followup", target: true, unshared: true, question: p.followUp.question, reply1: p.followUp.reply, reply2: p.followUp.reply };
+      TARGETS.push(f);
+      byKey[f.key] = f;
+    }
+  });
   var asked = {};          // key -> true once sent
   var pendingKey = null;   // question that should be in the input
   var stagedKey = null;    // question currently (being) typed into the input
@@ -417,7 +433,7 @@ if (window.PROFILE && window.PROFILE.prompts) PROMPTS = window.PROFILE.prompts;
   function answerFor(p) {
     if (!p) return { text: fill("{Name} hasn't shared that with me. You could ask {him} directly once you match."), matched: "none" };
     if (!p.target) return { text: "That's on " + P.first + "'s profile: “" + pick(p.short) + "”", matched: p.key, target: false };
-    return { text: fill(pick(COND === 2 ? p.reply2 : p.reply1)), matched: p.key, target: true };
+    return { text: fill(pick(COND === 2 ? p.reply2 : p.reply1)), matched: p.key, target: true, unshared: !!p.unshared };
   }
 
   function sendQuestion(text, source, cardKey, via) {
@@ -425,7 +441,7 @@ if (window.PROFILE && window.PROFILE.prompts) PROMPTS = window.PROFILE.prompts;
     updateSend();
     addMsg("user", text);
     var a = answerFor(cardKey ? byKey[cardKey] : null);
-    log("question_sent", { text: text, source: source, via: via, matched: a.matched, target: !!a.target });
+    log("question_sent", { text: text, source: source, via: via, matched: a.matched, target: !!a.target, unshared: !!a.unshared });
     // Each sentence arrives as its own bubble, with a typing indicator before it.
     var sentences = a.text.match(/[^.!?]+[.!?]+["”]?(\s+|$)/g) || [a.text];
     sentences = sentences.map(function (x) { return x.trim(); });
@@ -444,7 +460,7 @@ if (window.PROFILE && window.PROFILE.prompts) PROMPTS = window.PROFILE.prompts;
         prevRow = addMsg("bot", sentences[k]);
         if (k) prevRow.classList.add("cont");
         if (k + 1 < sentences.length) { next(k + 1); return; }
-        log("reply_shown", { matched: a.matched, target: !!a.target, text: a.text, bubbles: sentences.length });
+        log("reply_shown", { matched: a.matched, target: !!a.target, unshared: !!a.unshared, text: a.text, bubbles: sentences.length });
         busy = false;
         updateSend();
         setTimeout(function () { refresh("after_reply"); }, AUTOTYPE_PAUSE_MS);
